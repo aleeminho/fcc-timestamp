@@ -34,22 +34,17 @@ app.get('/api', (req, res) => {
 
 app.get('/api/:date', (req, res) => {
   let date = req.params.date
-  let dateObj = new Date(date);
   if (!date.includes('-')) {
     dateObj = new Date(parseInt(date))
   }
-  if (isNaN(dateObj.getTime())) {
-    res.json({ error: 'Invalid Date' });
-  } else if (date.includes('-')) {
-    res.json({
-      unix: dateObj.getTime(),
-      utc: dateObj.toUTCString()
-    });
+  if (!isNaN(Date.parse(date))) {
+    let dateObject = new Date(date);
+    res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
+  } else if (/\d{5,}/.test(date)) {
+    let dateInt = parseInt(date);
+    res.json({ unix: dateInt, utc: new Date(dateInt).toUTCString() });
   } else {
-    res.json({
-      unix: parseInt(date),
-      utc: dateObj.toUTCString()
-    })
+    res.json({ error: "Invalid Date" });
   }
 })
 
